@@ -44,6 +44,26 @@ def Menu():
     def recordpage():
         root.minsize(height=200, width=170)
 
+
+        #Making everything global to be used on the back function
+        global customernamelabel
+        global itemhiredlabel
+        global itemquantitylabel
+        global recipetnumlabel
+
+
+        #Labels for the input boxes
+        customernamelabel = Label(root,text="Customer Name")
+        customernamelabel.grid(column=1,row=2)
+        itemhiredlabel = Label(root,text="Hired Item")
+        itemhiredlabel.grid(column=2,row=2)
+        itemquantitylabel = Label(root,text="Item Quantity")
+        itemquantitylabel.grid(column=3,row=2)
+        recipetnumlabel = Label(root,text="Recipet Number")
+        recipetnumlabel.grid(column=4,row=2)
+
+        #Input boxes
+
         #Destorying previous page elemnts
         menubutton_1.destroy()
         menubutton_2.destroy()
@@ -55,7 +75,7 @@ def Menu():
         #Adding back button for record keeping page
         global button_2
         button_2= Button(root,text="<--Menu", width="7", command=back, activebackground="red")
-        button_2.grid(column=1,row=1)
+        button_2.grid(column=1,row=1, sticky=W)
 
         #Add a message box for errors
 
@@ -70,10 +90,29 @@ def Menu():
         emptylabel1.destroy()
         emptylabel2.destroy()
 
+        #Making everything global to be used on the back function
+        global customernamelabel
+        global itemhiredlabel
+        global itemquantitylabel
+        global recipetnumlabel
+
+
+        #Labels for the grid boxes
+        customernamelabel = Label(root,text="Customer Name")
+        customernamelabel.grid(column=1,row=2)
+        itemhiredlabel = Label(root,text="Hired Item")
+        itemhiredlabel.grid(column=2,row=2)
+        itemquantitylabel = Label(root,text="Item Quantity")
+        itemquantitylabel.grid(column=3,row=2)
+        recipetnumlabel = Label(root,text="Recipet Number")
+        recipetnumlabel.grid(column=4,row=2)
+
+        
         #Adding back button for record viewing page
         global button_2
         button_2= Button(root,text="<--Menu", width="7", command=back, activebackground="red")
-        button_2.grid(column=1,row=1)
+        button_2.grid(column=1,row=1,sticky=W)
+        
 
     def helppage():
         root.minsize(height=200, width=170)
@@ -97,7 +136,14 @@ def Menu():
         root.minsize(height=200, width=170)
         root.title("Party Hire Store Record Keeper")
         Menu()
+        #removing the back button
         button_2.destroy()
+        #Removing the other assests,  buttons and labels
+        customernamelabel.destroy()
+        itemhiredlabel.destroy()
+        itemquantitylabel.destroy()
+        recipetnumlabel.destroy()
+        
 
 
     #Labeling the main menu
