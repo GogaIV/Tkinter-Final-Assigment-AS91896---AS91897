@@ -49,8 +49,11 @@ def Menu():
         global customernamelabel
         global itemhiredlabel
         global itemquantitylabel
-        global recipetnumlabel
-
+        global recieptnumlabel
+        global customernameinput
+        global itemquantityinput
+        global recieptnuminput
+        global itemhiredinput
 
         #Labels for the input boxes
         customernamelabel = Label(root,text="Customer Name")
@@ -59,10 +62,31 @@ def Menu():
         itemhiredlabel.grid(column=2,row=2)
         itemquantitylabel = Label(root,text="Item Quantity")
         itemquantitylabel.grid(column=3,row=2)
-        recipetnumlabel = Label(root,text="Recipet Number")
-        recipetnumlabel.grid(column=4,row=2)
+        recieptnumlabel = Label(root,text="reciept Number")
+        recieptnumlabel.grid(column=4,row=2)
 
         #Input boxes
+        customernameinput = Entry(root)
+        customernameinput.grid(column=1,row=3)
+        itemhiredinput = Entry(root)
+        itemhiredinput.grid(column=2,row=3)
+        itemquantityinput = Entry(root)
+        itemquantityinput.grid(column=3,row=3)
+        recieptnuminput = Entry(root)
+        recieptnuminput.grid(column=4,row=3)
+
+        #Adding enter button to accept the values enetered 
+        def enter():
+            cni = customernameinput.get()
+            ihi = itemhiredinput.get()
+            iqi = itemquantityinput.get()
+            rni = recieptnuminput.get()
+            print(cni,ihi,iqi,rni)
+
+        enterbutton = Button(root, text="Enter", command=enter)
+        enterbutton.grid(column=1, row=5)
+        
+            
 
         #Destorying previous page elemnts
         menubutton_1.destroy()
@@ -94,7 +118,7 @@ def Menu():
         global customernamelabel
         global itemhiredlabel
         global itemquantitylabel
-        global recipetnumlabel
+        global recieptnumlabel
 
 
         #Labels for the grid boxes
@@ -104,8 +128,8 @@ def Menu():
         itemhiredlabel.grid(column=2,row=2)
         itemquantitylabel = Label(root,text="Item Quantity")
         itemquantitylabel.grid(column=3,row=2)
-        recipetnumlabel = Label(root,text="Recipet Number")
-        recipetnumlabel.grid(column=4,row=2)
+        recieptnumlabel = Label(root,text="reciept Number")
+        recieptnumlabel.grid(column=4,row=2)
 
         
         #Adding back button for record viewing page
@@ -136,13 +160,20 @@ def Menu():
         root.minsize(height=200, width=170)
         root.title("Party Hire Store Record Keeper")
         Menu()
+
         #removing the back button
         button_2.destroy()
+
         #Removing the other assests,  buttons and labels
         customernamelabel.destroy()
         itemhiredlabel.destroy()
         itemquantitylabel.destroy()
-        recipetnumlabel.destroy()
+        recieptnumlabel.destroy()
+        customernameinput.destroy()
+        itemhiredinput.destroy()
+        itemquantityinput.destroy()
+        recieptnuminput.destroy()
+        
         
 
 
