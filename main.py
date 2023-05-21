@@ -3,6 +3,8 @@ from tkcalendar import *
 import base64, zlib
 import tempfile
 from tkinter import messagebox
+import tkinter.font as tkfont
+import sqlite3
 
 
 # Making a clear icon instead of feather on program window
@@ -90,6 +92,7 @@ def Menu():
         global item_quantity_input
         global reciept_num_input
         global item_hired_input
+        global enterbutton
 
         # Labels for the input boxes
         customer_name_label = Label(root, text="Customer Name")
@@ -98,7 +101,7 @@ def Menu():
         item_hired_label.grid(column=2, row=2)
         item_quantity_label = Label(root, text="Item Quantity")
         item_quantity_label.grid(column=3, row=2)
-        reciept_num_label = Label(root, text="reciept Number")
+        reciept_num_label = Label(root, text="Reciept Number")
         reciept_num_label.grid(column=4, row=2)
 
         # Input boxes
@@ -113,20 +116,24 @@ def Menu():
 
         # Adding enter button to accept the values enetered
         def enter():
+            # Making message boxes for incorrect input values
 
-            #Making message boxes for incorrect input values
-
-            #Checks if item quantity inputted is a number
+            # Checks if item quantity inputted is a number
             try:
                 item_quantity_input_interger = int(item_quantity_input.get())
             except ValueError:
                 messagebox.showerror("Error", "Please enter number!")
-            
-            #Then checks if item quantity inputted is a number within 500 otherwise becomes invalid
+
+            # Then checks if item quantity inputted is a number within 500 otherwise becomes invalid
             if item_quantity_input_interger > 500:
                 messagebox.showerror("Error", "Please enter a number within 500!")
                 item_quantity_input_interger = " "
 
+            # Making all future values into global to be used in dictionary creation
+            global rni
+            global cni
+            global ihi
+            global iqi
             cni = customer_name_input.get()
             ihi = item_hired_input.get()
             iqi = item_quantity_input_interger
@@ -139,7 +146,6 @@ def Menu():
         # Destorying previous page elemnts
         menubutton_1.destroy()
         menubutton_2.destroy()
-        menubutton_3.destroy()
         label_1.destroy()
         emptylabel1.destroy()
         emptylabel2.destroy()
@@ -151,7 +157,6 @@ def Menu():
         )
         button_2.grid(column=1, row=1, sticky=W)
 
-        # Add a message box for errors
 
     # Making Record Viewing page
     def viewrecordspage():
@@ -159,7 +164,6 @@ def Menu():
         label_1.destroy()
         menubutton_1.destroy()
         menubutton_2.destroy()
-        menubutton_3.destroy()
         emptylabel1.destroy()
         emptylabel2.destroy()
 
@@ -176,8 +180,11 @@ def Menu():
         item_hired_label.grid(column=2, row=2)
         item_quantity_label = Label(root, text="Item Quantity")
         item_quantity_label.grid(column=3, row=2)
-        reciept_num_label = Label(root, text="reciept Number")
+        reciept_num_label = Label(root, text="Reciept Number")
         reciept_num_label.grid(column=4, row=2)
+
+        #Making each variable unique to place into grid boxes
+            
 
         # Adding back button for record viewing page
         global button_2
@@ -186,24 +193,6 @@ def Menu():
         )
         button_2.grid(column=1, row=1, sticky=W)
 
-    # Making a Help Page
-    def helppage():
-        root.minsize(height=200, width=170)
-        label_1.destroy()
-        menubutton_1.destroy()
-        menubutton_2.destroy()
-        menubutton_3.destroy()
-        emptylabel1.destroy()
-        emptylabel2.destroy()
-
-        # Making the text for the help page
-
-        # Adding back button for help page
-        global button_2
-        button_2 = Button(
-            root, text="<--Menu", width="7", command=back, activebackground="red"
-        )
-        button_2.grid(column=1, row=1)
 
         # Making a back button that can be used on all pages.
 
@@ -218,6 +207,7 @@ def Menu():
         # Removing the other assests,  buttons and labels
         customer_name_label.destroy()
         item_hired_label.destroy()
+        enterbutton.destroy()
         item_quantity_label.destroy()
         reciept_num_label.destroy()
         customer_name_input.destroy()
@@ -226,7 +216,7 @@ def Menu():
         reciept_num_input.destroy()
 
     # Labeling the main menu
-    label_1 = Label(root, text="Main Menu")
+    label_1 = Label(root, text="Main Menu", font=(25))
     label_1.grid(column=2, row=1)
 
     # Making buttons to seperate
@@ -238,10 +228,6 @@ def Menu():
         root, text="View Records", command=viewrecordspage, activebackground="white"
     )
     menubutton_2.grid(column=2, row=3)
-    menubutton_3 = Button(
-        root, text="How to Use?", command=helppage, activebackground="white"
-    )
-    menubutton_3.grid(column=2, row=4)
 
     # Adding a spacing between sides and menu
     emptylabel1 = Label(root, text="", padx=20)
