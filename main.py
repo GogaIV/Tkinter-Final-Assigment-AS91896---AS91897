@@ -23,6 +23,7 @@ root.minsize(height=120, width=170)
 root.title("Main Menu")
 canvas = Canvas(root)
 
+
 # Making the program look better with rounded corners
 def round_rectangle_border(x1, y1, x2, y2, radius=25, **kwargs):
     points = [
@@ -111,10 +112,12 @@ def Menu():
         reciept_num_input = Entry(root)
         reciept_num_input.grid(column=4, row=3)
 
+        # Empty record list
+        datalist = []
+
         # Adding enter button to accept the values enetered
         def enter():
-            # Making message boxes for incorrect input values
-
+            global datalist
             # Checks if item quantity inputted is a number
             try:
                 item_quantity_input_interger = int(item_quantity_input.get())
@@ -127,15 +130,15 @@ def Menu():
                 item_quantity_input_interger = " "
 
             # Making all future values into global to be used in dictionary creation
-            global rni
-            global cni
-            global ihi
-            global iqi
-            cni = customer_name_input.get()
-            ihi = item_hired_input.get()
-            iqi = item_quantity_input_interger
-            rni = reciept_num_input.get()
-            print(cni, ihi, iqi, rni)
+            datalist.append(
+                [
+                    customer_name_input.get(),
+                    item_hired_input.get(),
+                    item_quantity_input_interger.get(),
+                    reciept_num_input.get(),
+                ]
+            )
+            update_record()
 
         enterbutton = Button(root, text="Enter", command=enter)
         enterbutton.grid(column=1, row=5)
@@ -151,7 +154,6 @@ def Menu():
             root, text="<--Menu", width="7", command=back, activebackground="red"
         )
         button_2.grid(column=1, row=1, sticky=W)
-
 
     # Making Record Viewing page
     def viewrecordspage():
@@ -176,8 +178,7 @@ def Menu():
         reciept_num_label = Label(root, text="Reciept Number")
         reciept_num_label.grid(column=4, row=2)
 
-        #Making each variable unique to place into grid boxes
-            
+        # Making each variable unique to place into grid boxes
 
         # Adding back button for record viewing page
         global button_2
@@ -185,7 +186,6 @@ def Menu():
             root, text="<--Menu", width="7", command=back, activebackground="red"
         )
         button_2.grid(column=1, row=1, sticky=W)
-
 
         # Making a back button that can be used on all pages.
 
