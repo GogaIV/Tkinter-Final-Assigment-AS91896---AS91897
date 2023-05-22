@@ -127,14 +127,14 @@ def Menu():
             # Then checks if item quantity inputted is a number within 500 otherwise becomes invalid
             if item_quantity_input_interger > 500:
                 messagebox.showerror("Error", "Please enter a number within 500!")
-                item_quantity_input_interger = " "
+                item_quantity_input = " "
 
             # Making all future values into global to be used in dictionary creation
             datalist.append(
                 [
                     customer_name_input.get(),
                     item_hired_input.get(),
-                    item_quantity_input_interger.get(),
+                    item_quantity_input.get(),
                     reciept_num_input.get(),
                 ]
             )
