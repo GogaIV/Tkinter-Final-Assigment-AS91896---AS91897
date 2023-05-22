@@ -4,7 +4,7 @@ import tempfile
 from tkinter import messagebox
 import tkinter.font as tkfont
 
-#Making a transparent window icon instead of a feather
+# Making a transparent window icon instead of a feather
 ICON = zlib.decompress(
     base64.b64decode(
         "eJxjYGAEQgEBBiDJwZDBy"
@@ -17,7 +17,7 @@ with open(ICON_PATH, "wb") as icon_file:
 
 # Creating window for program
 root = Tk()
-#Icon bitmap sets the feather to whatever file I want it to be , in this case its transparent
+# Icon bitmap sets the feather to whatever file I want it to be , in this case its transparent
 root.iconbitmap(default=ICON_PATH)
 root.minsize(height=120, width=170)
 root.title("Main Menu")
@@ -113,21 +113,37 @@ def Menu():
         reciept_num_input = Entry(root)
         reciept_num_input.grid(column=4, row=3)
 
+
+        global select
+        global scroll_bar
+        scroll_bar = Scrollbar(root, orient=VERTICAL)
+        select = Listbox(root, yscrollcommand=scroll_bar.set, height=30, width=60)
+        scroll_bar.configure(command=select.yview)
+        scroll_bar.grid(column=3, row=2)
+        select.grid(column=1, row=6)
+
         # Empty record list
         datalist = []
 
+        global update_record
+
+        def update_record():
+            select.delete(0, END)
+            for n, p, a in datalist:
+                select.insert(END, n)
+
         # Adding enter button to accept the values enetered
         def enter():
-            # Checks if item quantity inputted is a number
-            try:
-                item_quantity_input_interger = int(item_quantity_input.get())
-            except ValueError:
-                messagebox.showerror("Error", "Please enter number!")
+            # # Checks if item quantity inputted is a number
+            # try:
+            #     item_quantity_input_interger = int(item_quantity_input.get())
+            # except ValueError:
+            #     messagebox.showerror("Error", "Please enter number!")
 
-            # Then checks if item quantity inputted is a number within 500 otherwise becomes invalid
-            if item_quantity_input_interger > 500:
-                messagebox.showerror("Error", "Please enter a number within 500!")
-                item_quantity_input = " "
+            # # Then checks if item quantity inputted is a number within 500 otherwise becomes invalid
+            # if item_quantity_input_interger > 500:
+            #     messagebox.showerror("Error", "Please enter a number within 500!")
+            #     item_quantity_input = " "
 
             # Making all future values into global to be used in dictionary creation
             datalist.append(
@@ -168,17 +184,6 @@ def Menu():
         def delete():
             del datalist[int(select.curseselection()[0])]
             update_record()
-        
-        def update_record():
-            select.delete(0, END)
-            for n,p,a in datalist:
-                select.insert(END, n)
-
-        scroll_bar = Scrollbar(root, orient=VERTICAL)
-        select = Listbox(root, yscrollcommand=scroll_bar.set, height=100, width=160)
-        scroll_bar.configure(command=select.yview)
-        # scroll_bar.grid(column=4, fill=Y)
-        # select.place(x=200,y=260)
 
         # Making everything global to be used on the back function
         global customer_name_label
@@ -225,6 +230,8 @@ def Menu():
         item_hired_input.destroy()
         item_quantity_input.destroy()
         reciept_num_input.destroy()
+        select.destroy()
+        scroll_bar.destroy()
 
     # Labeling the main menu
     label_name = Label(
