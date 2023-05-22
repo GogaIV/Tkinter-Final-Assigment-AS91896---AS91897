@@ -4,27 +4,24 @@ import base64, zlib
 import tempfile
 from tkinter import messagebox
 import tkinter.font as tkfont
-import sqlite3
 
 
-# Making a clear icon instead of feather on program window
-# ICON = zlib.decompress(
-#     base64.b64encode(
-#         "eJxjYGAEQgEBBiDJwZDBy"
-#         "sAgxsDAoAHEQCEGBQaIOAg4sDIgACMUj4JRMApGwQgF/ykEAFXxQRc="
-#     )
-# )
-
-# _, ICON_PATH = tempfile.mkstemp()
-# with open(ICON_PATH, "wb") as icon_file:
-#     icon_file.write(ICON)
+ICON = zlib.decompress(
+    base64.b64decode(
+        "eJxjYGAEQgEBBiDJwZDBy"
+        "sAgxsDAoAHEQCEGBQaIOAg4sDIgACMUj4JRMApGwQgF/ykEAFXxQRc="
+    )
+)
+_, ICON_PATH = tempfile.mkstemp()
+with open(ICON_PATH, "wb") as icon_file:
+    icon_file.write(ICON)
 
 # Creating window for program
 root = Tk()
-root.minsize(height=200, width=170)
-root.title("Party Hire Store Record Keeper")
+root.iconbitmap(default=ICON_PATH)
+root.minsize(height=120, width=170)
+root.title("Main Menu")
 canvas = Canvas(root)
-
 
 # Making the program look better with rounded corners
 def round_rectangle_border(x1, y1, x2, y2, radius=25, **kwargs):
@@ -146,9 +143,7 @@ def Menu():
         # Destorying previous page elemnts
         menubutton_1.destroy()
         menubutton_2.destroy()
-        label_1.destroy()
-        emptylabel1.destroy()
-        emptylabel2.destroy()
+        label_name.destroy()
 
         # Adding back button for record keeping page
         global button_2
@@ -161,11 +156,9 @@ def Menu():
     # Making Record Viewing page
     def viewrecordspage():
         root.minsize(height=200, width=170)
-        label_1.destroy()
+        label_name.destroy()
         menubutton_1.destroy()
         menubutton_2.destroy()
-        emptylabel1.destroy()
-        emptylabel2.destroy()
 
         # Making everything global to be used on the back function
         global customer_name_label
@@ -216,8 +209,10 @@ def Menu():
         reciept_num_input.destroy()
 
     # Labeling the main menu
-    label_1 = Label(root, text="Main Menu", font=(25))
-    label_1.grid(column=2, row=1)
+    label_name = Label(
+        root, text="Party Hire Store Record Keeper", font=(25), padx=8, pady=5
+    )
+    label_name.grid(column=2, row=1)
 
     # Making buttons to seperate
     menubutton_1 = Button(
@@ -228,12 +223,6 @@ def Menu():
         root, text="View Records", command=viewrecordspage, activebackground="white"
     )
     menubutton_2.grid(column=2, row=3)
-
-    # Adding a spacing between sides and menu
-    emptylabel1 = Label(root, text="", padx=20)
-    emptylabel1.grid(column=1, row=2)
-    emptylabel2 = Label(root, text="", padx=20)
-    emptylabel2.grid(column=3, row=2)
 
 
 Menu()
