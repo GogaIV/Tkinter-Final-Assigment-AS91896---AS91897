@@ -1,5 +1,4 @@
 from tkinter import *
-from tkcalendar import *
 import base64, zlib
 import tempfile
 from tkinter import messagebox
