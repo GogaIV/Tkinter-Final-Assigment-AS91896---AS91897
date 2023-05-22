@@ -5,7 +5,7 @@ import tempfile
 from tkinter import messagebox
 import tkinter.font as tkfont
 
-
+#Making a transparent window icon instead of a feather
 ICON = zlib.decompress(
     base64.b64decode(
         "eJxjYGAEQgEBBiDJwZDBy"
@@ -18,6 +18,7 @@ with open(ICON_PATH, "wb") as icon_file:
 
 # Creating window for program
 root = Tk()
+#Icon bitmap sets the feather to whatever file I want it to be , in this case its transparent
 root.iconbitmap(default=ICON_PATH)
 root.minsize(height=120, width=170)
 root.title("Main Menu")
@@ -91,6 +92,7 @@ def Menu():
         global reciept_num_input
         global item_hired_input
         global enterbutton
+        global datalist
 
         # Labels for the input boxes
         customer_name_label = Label(root, text="Customer Name")
@@ -117,7 +119,6 @@ def Menu():
 
         # Adding enter button to accept the values enetered
         def enter():
-            global datalist
             # Checks if item quantity inputted is a number
             try:
                 item_quantity_input_interger = int(item_quantity_input.get())
@@ -161,6 +162,24 @@ def Menu():
         label_name.destroy()
         menubutton_1.destroy()
         menubutton_2.destroy()
+
+        global delete
+        global update_record
+
+        def delete():
+            del datalist[int(select.curseselection()[0])]
+            update_record()
+        
+        def update_record():
+            select.delete(0, END)
+            for n,p,a in datalist:
+                select.insert(END, n)
+
+        scroll_bar = Scrollbar(root, orient=VERTICAL)
+        select = Listbox(root, yscrollcommand=scroll_bar.set, height=100, width=160)
+        scroll_bar.configure(command=select.yview)
+        # scroll_bar.grid(column=4, fill=Y)
+        # select.place(x=200,y=260)
 
         # Making everything global to be used on the back function
         global customer_name_label
