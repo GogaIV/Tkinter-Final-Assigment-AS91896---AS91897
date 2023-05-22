@@ -1,7 +1,6 @@
 from tkinter import *
 from tkcalendar import *
-import base64
-import zlib
+import base64, zlib
 import tempfile
 from tkinter import messagebox
 import tkinter.font as tkfont
@@ -9,22 +8,21 @@ import sqlite3
 
 
 # Making a clear icon instead of feather on program window
-ICON = zlib.decompress(
-    base64.b64decode(
-        "eJxjYGAEQgEBBiDJwZDBy"
-        "sAgxsDAoAHEQCEGBQaIOAg4sDIgACMUj4JRMApGwQgF/ykEAFXxQRc="
-    )
-)
+# ICON = zlib.decompress(
+#     base64.b64encode(
+#         "eJxjYGAEQgEBBiDJwZDBy"
+#         "sAgxsDAoAHEQCEGBQaIOAg4sDIgACMUj4JRMApGwQgF/ykEAFXxQRc="
+#     )
+# )
 
-_, ICON_PATH = tempfile.mkstemp()
-with open(ICON_PATH, "wb") as icon_file:
-    icon_file.write(ICON)
+# _, ICON_PATH = tempfile.mkstemp()
+# with open(ICON_PATH, "wb") as icon_file:
+#     icon_file.write(ICON)
 
 # Creating window for program
 root = Tk()
-root.iconbitmap(default=ICON_PATH)
-root.minsize(height=120, width=170)
-root.title("Main Menu")
+root.minsize(height=200, width=170)
+root.title("Party Hire Store Record Keeper")
 canvas = Canvas(root)
 
 
@@ -83,10 +81,6 @@ my_rectangle = round_rectangle_border(50, 50, 150, 100, radius=20, fill="blue")
 def Menu():
     # Making record keeper page
     def recordpage():
-        # Destorying previous page elemnts
-        menubutton_1.destroy()
-        label_name.destroy()
-        root.title("Record Manager")
         root.minsize(height=200, width=170)
 
         # Making everything global to be used on the back function
@@ -99,7 +93,6 @@ def Menu():
         global reciept_num_input
         global item_hired_input
         global enterbutton
-        global query_button
 
         # Labels for the input boxes
         customer_name_label = Label(root, text="Customer Name")
@@ -121,135 +114,97 @@ def Menu():
         reciept_num_input = Entry(root)
         reciept_num_input.grid(column=4, row=3)
 
-        # Making databse
-        conn = sqlite3.connect("partyhires.db")
-
-        # Creating a cursor for databse
-        c = conn.cursor()
-
-        # c.execute(
-        #         """CREATE TABLE partyhires (
-        #         customer_name_label text,
-        #         item_hired_label text,
-        #         item_quantity_label interger,
-        #         reciept_num_label text
-        #         )"""
-        # )
-
         # Adding enter button to accept the values enetered
-
         def enter():
+            # Making message boxes for incorrect input values
+
             # Checks if item quantity inputted is a number
-            # try:
-            #     global item_quantity_input_interger
-            #     item_quantity_input_interger = int(item_quantity_input.get())
-            # except ValueError:
-            #     messagebox.showerror("Error", "Please enter number!")
+            try:
+                item_quantity_input_interger = int(item_quantity_input.get())
+            except ValueError:
+                messagebox.showerror("Error", "Please enter number!")
 
-            # # Then checks if item quantity inputted is a number within 500 otherwise becomes invalid
-            # if item_quantity_input_interger > 500:
-            #     messagebox.showerror("Error", "Please enter a number within 500!")
-            #     item_quantity_input = " "
+            # Then checks if item quantity inputted is a number within 500 otherwise becomes invalid
+            if item_quantity_input_interger > 500:
+                messagebox.showerror("Error", "Please enter a number within 500!")
+                item_quantity_input_interger = " "
 
-            # Making database
-            conn = sqlite3.connect("partyhires.db")
-
-            # Creating a cursor for databse
-            c = conn.cursor()
-
-            # Creating databse
-            c.execute(
-                "INSERT INTO partyhires VALUES (:customer_name_input, :item_hired_input, :item_quantity_input, :reciept_num_input)",
-                {
-                    "customer_name_input": customer_name_input.get(),
-                    "item_hired_input": item_hired_input.get(),
-                    "item_quantity_input": item_quantity_input.get(),
-                    "reciept_num_input": reciept_num_input.get(),
-                },
-            )
-
-            # Commiting the changes to database
-            conn.commit()
-
-            # Closing the connectin for when user presses X
-            conn.close()
-
-            customer_name_input.delete(0, END)
-            item_hired_input.delete(0, END)
-            item_quantity_input.delete(0, END)
-            reciept_num_input.delete(0, END)
-
-        # Create function for query button
-        def query():
-            # Making database
-            conn = sqlite3.connect("partyhires.db")
-
-            # Creating a cursor for databse
-            c = conn.cursor()
-
-            # Querying databse
-            c.execute("SELECT *, oid FROM partyhires")
-            records = c.fetchall()
-            print(records)
-
-            # Loop through records
-            print_records = ""
-            for record in records:
-                print_records +=  str(record[0]) + " " + str(record[6]) + "\n"
-
-            query_label = Label(root, text=print_records)
-            query_label.grid(row=6, column=1)
-
-            print_records = ""
-            for record in records:
-                print_records += record[1] + "\n"
-
-            query_label2 = Label(root, text=print_records)
-            query_label2.grid(row=6, column=2)
-
-            for record in records:
-                print_records += str(record[2]) + "\n"
-
-            query_label3 = Label(root, text=print_records)
-            query_label3.grid(row=6, column=3)
-
-            for record in records:
-                print_records += str(record[3]) + "\n"
-
-            query_label4 = Label(root, text=print_records)
-            query_label4.grid(row=6, column=4)
-
-            # Commiting the changes to database
-            conn.commit()
-
-            # Closing the connectin for when user presses X
-            conn.close()
+            # Making all future values into global to be used in dictionary creation
+            global rni
+            global cni
+            global ihi
+            global iqi
+            cni = customer_name_input.get()
+            ihi = item_hired_input.get()
+            iqi = item_quantity_input_interger
+            rni = reciept_num_input.get()
+            print(cni, ihi, iqi, rni)
 
         enterbutton = Button(root, text="Enter", command=enter)
         enterbutton.grid(column=1, row=5)
 
-        # Creating a query button
-        query_button = Button(root, text="Show Records", command=query)
-        query_button.grid(column=3, row=1, sticky=W)
+        # Destorying previous page elemnts
+        menubutton_1.destroy()
+        menubutton_2.destroy()
+        label_1.destroy()
+        emptylabel1.destroy()
+        emptylabel2.destroy()
 
         # Adding back button for record keeping page
         global button_2
         button_2 = Button(
             root, text="<--Menu", width="7", command=back, activebackground="red"
         )
-        button_2.grid(column=2, row=1, sticky=E)
+        button_2.grid(column=1, row=1, sticky=W)
+
+
+    # Making Record Viewing page
+    def viewrecordspage():
+        root.minsize(height=200, width=170)
+        label_1.destroy()
+        menubutton_1.destroy()
+        menubutton_2.destroy()
+        emptylabel1.destroy()
+        emptylabel2.destroy()
+
+        # Making everything global to be used on the back function
+        global customer_name_label
+        global item_hired_label
+        global item_quantity_label
+        global reciept_num_label
+
+        # Labels for the grid boxes
+        customer_name_label = Label(root, text="Customer Name")
+        customer_name_label.grid(column=1, row=2)
+        item_hired_label = Label(root, text="Hired Item")
+        item_hired_label.grid(column=2, row=2)
+        item_quantity_label = Label(root, text="Item Quantity")
+        item_quantity_label.grid(column=3, row=2)
+        reciept_num_label = Label(root, text="Reciept Number")
+        reciept_num_label.grid(column=4, row=2)
+
+        #Making each variable unique to place into grid boxes
+            
+
+        # Adding back button for record viewing page
+        global button_2
+        button_2 = Button(
+            root, text="<--Menu", width="7", command=back, activebackground="red"
+        )
+        button_2.grid(column=1, row=1, sticky=W)
+
 
         # Making a back button that can be used on all pages.
 
     def back():
-        root.minsize(height=120, width=170)
-        root.title("Main Menu")
+        root.minsize(height=200, width=170)
+        root.title("Party Hire Store Record Keeper")
         Menu()
 
         # removing the back button
         button_2.destroy()
 
-        # Removing the other assests, buttons and labels
+        # Removing the other assests,  buttons and labels
         customer_name_label.destroy()
         item_hired_label.destroy()
         enterbutton.destroy()
@@ -259,21 +214,26 @@ def Menu():
         item_hired_input.destroy()
         item_quantity_input.destroy()
         reciept_num_input.destroy()
-        query_button.destroy()
 
     # Labeling the main menu
-    label_name = Label(
-        root, text="Party Hire Store Record Keeper", font=(25), padx=8, pady=5
-    )
-    label_name.grid(column=2, row=1)
+    label_1 = Label(root, text="Main Menu", font=(25))
+    label_1.grid(column=2, row=1)
 
     # Making buttons to seperate
     menubutton_1 = Button(
-        root, text="Record Manager", command=recordpage, activebackground="white"
+        root, text="Add a Record", command=recordpage, activebackground="white"
     )
-    menubutton_1.grid(column=2, row=3)
+    menubutton_1.grid(column=2, row=2)
+    menubutton_2 = Button(
+        root, text="View Records", command=viewrecordspage, activebackground="white"
+    )
+    menubutton_2.grid(column=2, row=3)
 
-    menubutton_2
+    # Adding a spacing between sides and menu
+    emptylabel1 = Label(root, text="", padx=20)
+    emptylabel1.grid(column=1, row=2)
+    emptylabel2 = Label(root, text="", padx=20)
+    emptylabel2.grid(column=3, row=2)
 
 
 Menu()
