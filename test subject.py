@@ -2,142 +2,100 @@
 # Change all my code to test one function
 # Import Module
 from tkinter import *
-import base64, zlib
-import tempfile
-from tkinter import messagebox
-import tkinter.font as tkfont
 
-# Making a transparent window icon instead of a feather
-ICON = zlib.decompress(
-    base64.b64decode(
-        "eJxjYGAEQgEBBiDJwZDBy"
-        "sAgxsDAoAHEQCEGBQaIOAg4sDIgACMUj4JRMApGwQgF/ykEAFXxQRc="
-    )
-)
-_, ICON_PATH = tempfile.mkstemp()
-with open(ICON_PATH, "wb") as icon_file:
-    icon_file.write(ICON)
-
-# Creating window for program
+# Create Object
 root = Tk()
-# Icon bitmap sets the feather to whatever file I want it to be , in this case its transparent
-root.iconbitmap(default=ICON_PATH)
-root.minsize(height=300, width=400)
-root.title("Main Menu")
-canvas = Canvas(root)
 
-
-# Making the program look better with rounded corners
-def round_rectangle_border(x1, y1, x2, y2, radius=25, **kwargs):
-    points = [
-        x1 + radius,
-        y1,
-        x1 + radius,
-        y1,
-        x2 - radius,
-        y1,
-        x2 - radius,
-        y1,
-        x2,
-        y1,
-        x2,
-        y1 + radius,
-        x2,
-        y1 + radius,
-        x2,
-        y2 - radius,
-        x2,
-        y2 - radius,
-        x2,
-        y2,
-        x2 - radius,
-        y2,
-        x2 - radius,
-        y2,
-        x1 + radius,
-        y2,
-        x1 + radius,
-        y2,
-        x1,
-        y2,
-        x1,
-        y2 - radius,
-        x1,
-        y2 - radius,
-        x1,
-        y1 + radius,
-        x1,
-        y1 + radius,
-        x1,
-        y1,
-    ]
-
-    return canvas.create_polygon(points, **kwargs, smooth=True)
-
-
-my_rectangle = round_rectangle_border(50, 50, 150, 100, radius=20, fill="blue")
-
+# Set geometry
+root.geometry('400x500')
 
 # Information List
-datalist = []
-
+datas = []
 
 # Add Information
 def add():
-    global datalist
-    datalist.append([name.get(), recieptnum.get(), itemquantity.get()])
+    global datas
+    datas.append([Name.get(), ItemHired.get(), ItemQuantity.get(), ReceiptNumber.get()])
     update_book()
 
+# View Information
+def view(*args):
+    selection = select.curselection()
+    if selection:
+        index = int(selection[0])
+        Name.set(datas[index][0])
+        ItemHired.set(datas[index][1])
+        ItemQuantity.set(datas[index][2])
+        ReceiptNumber.set(datas[index][3])
 
 # Delete Information
 def delete():
-    del datalist[int(select.curselection()[0])]
-    update_book()
-
+    selection = select.curselection()
+    if selection:
+        index = int(selection[0])
+        del datas[index]
+        update_book()
 
 # Update Information
 def update_book():
     select.delete(0, END)
-    for n, p, a in datalist:
-        select.insert(END, n, p, a)
+    for data in datas:
+        select.insert(END, data)
 
+# Create a new Toplevel window
+listbox_window = Toplevel(root)
+listbox_window.title("List Box")
+listbox_window.withdraw()  # Hide the window initially
 
-# Add Buttons, Label, ListBox
-name = StringVar()
-itemhired = StringVar()
-itemquantity = StringVar()
-recieptnum = StringVar()
-
-frame1 = Frame()
-frame1.grid(column=1, row=1)
-
-frame2 = Frame()
-frame2.grid(column=1, row=2)
-
-namelabel = Label(frame1, text="Name").grid(column=1, row=1, sticky=W)
-Name = Entry(frame1, textvariable=name).grid(column=2, row=1)
-
-itemhiredlabel = Label(frame1, text="Item").grid(column=1, row=2, sticky=W)
-itemhired = Entry(frame1, textvariable=itemhired).grid(column=2, row=2)
-
-itemquantitylabel = Label(frame1, text="Item Quantity").grid(column=1, row=3, sticky=W)
-itemquantity = Entry(frame1, textvariable=itemquantity)
-itemquantity.grid(column=2, row=3)
-
-reciptnumlabel = Label(frame1, text="Reciept Number").grid(column=1, row=4)
-recieptnum = Entry(frame1, textvariable=recieptnum)
-recieptnum.grid(column=2, row=4)
-
-Button(frame1, text="Add", command=add).grid(column=1, row=5, sticky=W)
-Button(frame1, text="Delete", command=delete).grid(column=1, row=5, sticky=E)
-
-
-scroll_bar = Scrollbar(frame2, orient=VERTICAL)
-select = Listbox(frame2, yscrollcommand=scroll_bar.set, height=14)
+scroll_bar = Scrollbar(listbox_window, orient=VERTICAL)
+select = Listbox(listbox_window, yscrollcommand=scroll_bar.set, height=10)
 scroll_bar.config(command=select.yview)
-scroll_bar.grid(column=3, row=1)
-select.grid(column=2, row=1)
+scroll_bar.pack(side=RIGHT, fill=Y)
+select.pack(fill=BOTH, expand=True)
 
+select.bind('<<ListboxSelect>>', view)  # Bind view function to selection event
+
+# Open the List Box Window
+def open_listbox_window():
+    update_book()  # Update the listbox with the latest data
+    listbox_window.deiconify()  # Show the List Box Window
+
+# Add Buttons, Label
+Name = StringVar()
+ItemHired = StringVar()
+ItemQuantity = IntVar()
+ReceiptNumber = StringVar()
+
+frame = Frame(root)
+frame.pack(pady=10)
+
+frame1 = Frame(root)
+frame1.pack()
+
+frame2 = Frame(root)
+frame2.pack(pady=10)
+
+frame3 = Frame(root)
+frame3.pack()
+
+Label(frame, text='Name').grid(row=0, column=0, sticky=W)
+Entry(frame, textvariable=Name, width=50).grid(row=0, column=1)
+
+Label(frame1, text='Item Hired').grid(row=0, column=0, sticky=W)
+Entry(frame1, textvariable=ItemHired, width=50).grid(row=0, column=1)
+
+Label(frame2, text='Item Quantity').grid(row=0, column=0, sticky=W)
+Entry(frame2, textvariable=ItemQuantity, width=37).grid(row=0, column=1)
+
+Label(frame3, text='Receipt Number').grid(row=0, column=0, sticky=W)
+Entry(frame3, textvariable=ReceiptNumber, width=37).grid(row=0, column=1)
+
+Button(root, text="Add", command=add).place(x=100, y=370)
+Button(root, text="Delete", command=delete).place(x=100, y=410)
+Button(root, text="View All", command=open_listbox_window).place(x=100, y=450)  # Button to open List Box Window
+
+# Initial population of Listbox
+update_book()
 
 # Execute Tkinter
 root.mainloop()
