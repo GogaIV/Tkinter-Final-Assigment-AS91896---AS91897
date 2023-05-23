@@ -1,9 +1,9 @@
 import tkinter as tk
 from tkinter import *
+import sqlite3
+from tkinter import messagebox
 import base64, zlib
 import tempfile
-from tkinter import messagebox
-
 
 #   Making a transparent window icon instead of a feather
 ICON = zlib.decompress(
@@ -16,89 +16,114 @@ _, ICON_PATH = tempfile.mkstemp()
 with open(ICON_PATH, "wb") as icon_file:
     icon_file.write(ICON)
 
+def record_viewer():
+    # Clear the existing labels in the display window
+    for widget in record_viewer_window.winfo_children():
+        widget.destroy()
 
-#  Creating the submit function that then is used to input
-#  box entries which can also be updated with the same function
-def submit():
-    # Checks if item quantity inputted is a number
-    try:
-        item_quantity_input_interger = item_quantity_entry.get()
-        int(item_quantity_input_interger)
-    except ValueError:
-        messagebox.showerror("Error", "Please enter number!")
+    # Fetch the inputs from the database
+    connection = sqlite3.connect("userdata.db")
+    cursor = connection.cursor()
+    cursor.execute("SELECT rowid, * FROM users")
+    users = cursor.fetchall()
+    connection.close()
 
-    # Then checks if item quantity inputted is a number within 500 otherwise becomes invalid
-    if item_quantity_input_interger > 500:
-        messagebox.showerror("Error", "Please enter a number within 500!")
-        item_quantity_entry = " "
+    # Create labels to define each column
+    name_label = tk.Label(record_viewer_window, text="Name", font=("Helvetica", 12, "bold"))
+    name_label.grid(row=0, column=0, padx=5, pady=5)
+    item_hired_label = tk.Label(
+        record_viewer_window, text="Item Hired", font=("Helvetica", 12, "bold")
+    )
+    item_hired_label.grid(row=0, column=1, padx=5, pady=5)
+    item_quantity_label = tk.Label(
+        record_viewer_window, text="Item Quantity", font=("Helvetica", 12, "bold")
+    )
+    item_quantity_label.grid(row=0, column=2, padx=5, pady=5)
+    receipt_number_label = tk.Label(
+        record_viewer_window, text="Receipt Number", font=("Helvetica", 12, "bold")
+    )
+    receipt_number_label.grid(row=0, column=3, padx=5, pady=5)
 
-    #  Get users input from input boxes
+    # Display the inputs in a grid
+    for i, user in enumerate(users):
+        party_hirer_info = user[0]
+        name_label = tk.Label(record_viewer_window, text=user[1])
+        name_label.grid(row=i + 1, column=0, padx=5, pady=5)
+        item_hired_label = tk.Label(record_viewer_window, text=user[2])
+        item_hired_label.grid(row=i + 1, column=1, padx=5, pady=5)
+        item_quantity_label = tk.Label(record_viewer_window, text=user[3])
+        item_quantity_label.grid(row=i + 1, column=2, padx=5, pady=5)
+        receipt_number_label = tk.Label(record_viewer_window, text=user[4])
+        receipt_number_label.grid(row=i + 1, column=3, padx=5, pady=5)
+        delete_button = tk.Button(
+            record_viewer_window,
+            text="Delete",
+            command=lambda id=party_hirer_info: delete_entry(id),
+        )
+        delete_button.grid(row=i + 1, column=4, padx=5, pady=5)
+
+
+def enter():
     name = name_entry.get()
     item_hired = item_hired_entry.get()
     item_quantity = item_quantity_entry.get()
     receipt_number = receipt_number_entry.get()
 
-    #  Add records to the listbox. The submit function only works if listbox already exists
-    information_list.append((name, item_hired, item_quantity, receipt_number))
+    # Validate item_quantity as a number within the range
+    if not item_quantity.isdigit() or not (1 <= int(item_quantity) <= 500):
+        messagebox.showerror(
+            "Invalid Input", "Item Quantity must be a number between 1 and 500."
+        )
+        return
 
-    #  Updates the listboxs with a new entry if a new entry exists in the entry boxes. Both these
-    # functions fit in the submit command. Even though they both do the same thing, they don't repeat twice
-    # The below function creates display_text and then adds all the the input fields
-    # to the into the listbox.
-    display_text = (
-        f"     {name}       \t{item_hired}\t{item_quantity}\t{receipt_number}"
+    # Validate receipt_number as a digit
+    if not receipt_number.isdigit():
+        messagebox.showerror("Invalid Input", "Receipt Number must be a digit.")
+        return
+
+    # Add "rcn" prefix to the receipt_number
+    receipt_number = "RCN" + receipt_number
+
+    # Save the inputs to a database
+    connection = sqlite3.connect("userdata.db")
+    cursor = connection.cursor()
+    cursor.execute(
+        "CREATE TABLE IF NOT EXISTS users (name TEXT, item_hired TEXT, item_quantity INTEGER, receipt_number INTEGER)"
     )
-    # Makes a display for the listbox
-    listbox.insert(tk.END, display_text)
+    cursor.execute(
+        "INSERT INTO users VALUES (?, ?, ?, ?)",
+        (name, item_hired, item_quantity, receipt_number),
+    )
+    connection.commit()
+    connection.close()
 
-    # Clear entry fields after the submit function is pressed
+    # Clear the entry fields after saving
     name_entry.delete(0, tk.END)
     item_hired_entry.delete(0, tk.END)
     item_quantity_entry.delete(0, tk.END)
     receipt_number_entry.delete(0, tk.END)
 
-
-# Making a function to open the window that shows the listbox
-# and showing the inputs from the entry boxes.
-def open_information_window():
-    info_window = tk.Toplevel(root)
-    info_window.title("Record Viewer")
-    info_window.geometry("400x300")
-
-    # Create a label for variable names on the second page
-    label_text = "Name\tItem Hired\tItem Quantity\tReceipt Number"
-    label = tk.Label(info_window, text=label_text)
-    label.pack(padx=20, pady=6)
-
-    #  Sets the width of the listbox when placing it on the page.
-    label_width = max(len(label["text"]) for label in labels_widgets)
-    listbox_width = label_width * 6  #  Adjust the factor to desired width
-
-    #  Creating the listbox to display the record and making it global to be used outside function
-    global listbox
-    listbox = tk.Listbox(info_window, height=10, width=listbox_width)
-    listbox.pack(padx=20, pady=10)
-
-    #  Insert initial variable values into the listbox. THIS CODE WILL NOT UPDATE THE LISTBOX
-    for info in information_list:
-        display_text = f"{info[0]}\t{info[1]}\t{info[2]}\t{info[3]}"
-        listbox.insert(tk.END, display_text)
-
-    # Makes function to delete listbox vairables when clicked on then clicked the button
-    def delete_selected():
-        selected_index = listbox.curselection()
-        if selected_index:
-            listbox.delete(selected_index)
-
-    #  Create delete button for second page
-    delete_button = tk.Button(info_window, text="Delete", command=delete_selected)
-    delete_button.pack(pady=10)
+    # Refresh the display window
+    record_viewer()
 
 
-#  Creates the program window and chooses the window icon to be transparent
+def delete_entry(party_hirer_info):
+    # Delete the selected entry from the database
+    connection = sqlite3.connect("userdata.db")
+    cursor = connection.cursor()
+    cursor.execute("DELETE FROM users WHERE rowid=?", (party_hirer_info,))
+    connection.commit()
+    connection.close()
+
+    # Refresh the display window
+    record_viewer()
+
+
+# Create the GUI window
 root = tk.Tk()
 root.iconbitmap(default=ICON_PATH)
-root.title("Receipt Manager")
+root.title("Julie's Party Hire Record Keeper")
+root.geometry("300x300")
 canvas = Canvas(root)
 
 
@@ -152,45 +177,39 @@ def round_rectangle_border(x1, y1, x2, y2, radius=25, **kwargs):
 
 my_rectangle = round_rectangle_border(50, 50, 150, 100, radius=20, fill="blue")
 
+# Create input labels and entry fields
+name_label = tk.Label(root, text="Name:")
+name_label.pack()
+name_entry = tk.Entry(root)
+name_entry.pack()
 
-# Create labels and entry fields. First are all the labels
-# This is the most efficient way to to creat all of them. This puts them into a list
-labels = ["Name:", "Item Hired:", "Item Quantity:", "Receipt Number:"]
-labels_widgets = []  #  Keep track of label widgets that are created
-entries = []  # Keeps track of the entires created.
-# After all labels were placed in a list the followinf code chooses one and then places
-#  it on the grid in a seperate line each time
-for i, label_text in enumerate(labels):
-    label = tk.Label(root, text=label_text)
-    label.grid(row=i, column=0, sticky=tk.W)
-    labels_widgets.append(
-        label
-    )  #  Add label widget to the list so that it can be seen on the program
-    entry = tk.Entry(root)
-    entry.grid(row=i, column=1)
-    entries.append(entry)
+item_hired_label = tk.Label(root, text="Item Hired:")
+item_hired_label.pack()
+item_hired_entry = tk.Entry(root)
+item_hired_entry.pack()
+
+item_quantity_label = tk.Label(root, text="Item Quantity:")
+item_quantity_label.pack()
+item_quantity_entry = tk.Entry(root)
+item_quantity_entry.pack()
+
+receipt_number_label = tk.Label(root, text="Receipt Number:")
+receipt_number_label.pack()
+receipt_number_entry = tk.Entry(root)
+receipt_number_entry.pack()
 
 
-name_entry = entries[0]
-item_hired_entry = entries[1]
-item_quantity_entry = entries[2]
-receipt_number_entry = entries[3]
+# Create a button to save the inputs
+enter_button = tk.Button(root, text="Enter", command=enter)
+enter_button.pack()
 
-#  Create submit button for all the
-submit_button = tk.Button(
-    root,
-    text="Submit",
-    command=submit,
-)
-submit_button.grid(row=len(labels), column=0, columnspan=2)
+# Create a display window
+record_viewer_window = tk.Toplevel(root)
+record_viewer_window.title("Julie's Party Hire Record Keeper")
 
-#  Create open record window button
-open_info_button = tk.Button(
-    root, text="Open Record Viewing Page", command=open_information_window
-)
-open_info_button.grid(row=len(labels) + 1, column=0, columnspan=2)
+# Create a button to access the window displaying the inputs
+record_viewer_button = tk.Button(root, text="Display Inputs", command=record_viewer)
+record_viewer_button.pack()
 
-#  Create list to store the record
-information_list = []
-
+# Start the main GUI loop
 root.mainloop()
