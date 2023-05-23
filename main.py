@@ -16,6 +16,7 @@ _, ICON_PATH = tempfile.mkstemp()
 with open(ICON_PATH, "wb") as icon_file:
     icon_file.write(ICON)
 
+
 def record_viewer():
     # Clear the existing labels in the display window
     for widget in record_viewer_window.winfo_children():
@@ -29,7 +30,9 @@ def record_viewer():
     connection.close()
 
     # Create labels to define each column
-    name_label = tk.Label(record_viewer_window, text="Name", font=("Helvetica", 12, "bold"))
+    name_label = tk.Label(
+        record_viewer_window, text="Name", font=("Helvetica", 12, "bold")
+    )
     name_label.grid(row=0, column=0, padx=5, pady=5)
     item_hired_label = tk.Label(
         record_viewer_window, text="Item Hired", font=("Helvetica", 12, "bold")
