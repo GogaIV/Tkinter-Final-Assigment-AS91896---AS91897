@@ -1,10 +1,11 @@
+import tkinter as tk
 from tkinter import *
 import base64, zlib
 import tempfile
 from tkinter import messagebox
-import tkinter.font as tkfont
 
-# Making a transparent window icon instead of a feather
+
+#   Making a transparent window icon instead of a feather
 ICON = zlib.decompress(
     base64.b64decode(
         "eJxjYGAEQgEBBiDJwZDBy"
@@ -15,16 +16,93 @@ _, ICON_PATH = tempfile.mkstemp()
 with open(ICON_PATH, "wb") as icon_file:
     icon_file.write(ICON)
 
-# Creating window for program
-root = Tk()
-# Icon bitmap sets the feather to whatever file I want it to be , in this case its transparent
+
+#  Creating the submit function that then is used to input
+#  box entries which can also be updated with the same function
+def submit():
+    # Checks if item quantity inputted is a number
+    try:
+        item_quantity_input_interger = item_quantity_entry.get()
+        int(item_quantity_input_interger)
+    except ValueError:
+        messagebox.showerror("Error", "Please enter number!")
+
+    # Then checks if item quantity inputted is a number within 500 otherwise becomes invalid
+    if item_quantity_input_interger > 500:
+        messagebox.showerror("Error", "Please enter a number within 500!")
+        item_quantity_entry = " "
+
+    #  Get users input from input boxes
+    name = name_entry.get()
+    item_hired = item_hired_entry.get()
+    item_quantity = item_quantity_entry.get()
+    receipt_number = receipt_number_entry.get()
+
+    #  Add records to the listbox. The submit function only works if listbox already exists
+    information_list.append((name, item_hired, item_quantity, receipt_number))
+
+    #  Updates the listboxs with a new entry if a new entry exists in the entry boxes. Both these
+    # functions fit in the submit command. Even though they both do the same thing, they don't repeat twice
+    # The below function creates display_text and then adds all the the input fields
+    # to the into the listbox.
+    display_text = (
+        f"     {name}       \t{item_hired}\t{item_quantity}\t{receipt_number}"
+    )
+    # Makes a display for the listbox
+    listbox.insert(tk.END, display_text)
+
+    # Clear entry fields after the submit function is pressed
+    name_entry.delete(0, tk.END)
+    item_hired_entry.delete(0, tk.END)
+    item_quantity_entry.delete(0, tk.END)
+    receipt_number_entry.delete(0, tk.END)
+
+
+# Making a function to open the window that shows the listbox
+# and showing the inputs from the entry boxes.
+def open_information_window():
+    info_window = tk.Toplevel(root)
+    info_window.title("Record Viewer")
+    info_window.geometry("400x300")
+
+    # Create a label for variable names on the second page
+    label_text = "Name\tItem Hired\tItem Quantity\tReceipt Number"
+    label = tk.Label(info_window, text=label_text)
+    label.pack(padx=20, pady=6)
+
+    #  Sets the width of the listbox when placing it on the page.
+    label_width = max(len(label["text"]) for label in labels_widgets)
+    listbox_width = label_width * 6  #  Adjust the factor to desired width
+
+    #  Creating the listbox to display the record and making it global to be used outside function
+    global listbox
+    listbox = tk.Listbox(info_window, height=10, width=listbox_width)
+    listbox.pack(padx=20, pady=10)
+
+    #  Insert initial variable values into the listbox. THIS CODE WILL NOT UPDATE THE LISTBOX
+    for info in information_list:
+        display_text = f"{info[0]}\t{info[1]}\t{info[2]}\t{info[3]}"
+        listbox.insert(tk.END, display_text)
+
+    # Makes function to delete listbox vairables when clicked on then clicked the button
+    def delete_selected():
+        selected_index = listbox.curselection()
+        if selected_index:
+            listbox.delete(selected_index)
+
+    #  Create delete button for second page
+    delete_button = tk.Button(info_window, text="Delete", command=delete_selected)
+    delete_button.pack(pady=10)
+
+
+#  Creates the program window and chooses the window icon to be transparent
+root = tk.Tk()
 root.iconbitmap(default=ICON_PATH)
-root.minsize(height=120, width=170)
-root.title("Main Menu")
+root.title("Receipt Manager")
 canvas = Canvas(root)
 
 
-# Making the program look better with rounded corners
+#  Making the corners of program rounded for operating systems that don't support it natively
 def round_rectangle_border(x1, y1, x2, y2, radius=25, **kwargs):
     points = [
         x1 + radius,
@@ -75,180 +153,44 @@ def round_rectangle_border(x1, y1, x2, y2, radius=25, **kwargs):
 my_rectangle = round_rectangle_border(50, 50, 150, 100, radius=20, fill="blue")
 
 
-# Creating the main menu
-def Menu():
-    # Making record keeper page
-    def recordpage():
-        root.minsize(height=200, width=170)
-
-        # Making everything global to be used on the back function
-        global customer_name_label
-        global item_hired_label
-        global item_quantity_label
-        global reciept_num_label
-        global customer_name_input
-        global item_quantity_input
-        global reciept_num_input
-        global item_hired_input
-        global enterbutton
-        global datalist
-
-        # Labels for the input boxes
-        customer_name_label = Label(root, text="Customer Name")
-        customer_name_label.grid(column=1, row=2)
-        item_hired_label = Label(root, text="Hired Item")
-        item_hired_label.grid(column=2, row=2)
-        item_quantity_label = Label(root, text="Item Quantity")
-        item_quantity_label.grid(column=3, row=2)
-        reciept_num_label = Label(root, text="Reciept Number")
-        reciept_num_label.grid(column=4, row=2)
-
-        # Input boxes
-        customer_name_input = Entry(root)
-        customer_name_input.grid(column=1, row=3)
-        item_hired_input = Entry(root)
-        item_hired_input.grid(column=2, row=3)
-        item_quantity_input = Entry(root)
-        item_quantity_input.grid(column=3, row=3)
-        reciept_num_input = Entry(root)
-        reciept_num_input.grid(column=4, row=3)
+# Create labels and entry fields. First are all the labels
+# This is the most efficient way to to creat all of them. This puts them into a list
+labels = ["Name:", "Item Hired:", "Item Quantity:", "Receipt Number:"]
+labels_widgets = []  #  Keep track of label widgets that are created
+entries = []  # Keeps track of the entires created.
+# After all labels were placed in a list the followinf code chooses one and then places
+#  it on the grid in a seperate line each time
+for i, label_text in enumerate(labels):
+    label = tk.Label(root, text=label_text)
+    label.grid(row=i, column=0, sticky=tk.W)
+    labels_widgets.append(
+        label
+    )  #  Add label widget to the list so that it can be seen on the program
+    entry = tk.Entry(root)
+    entry.grid(row=i, column=1)
+    entries.append(entry)
 
 
-        global select
-        global scroll_bar
-        scroll_bar = Scrollbar(root, orient=VERTICAL)
-        select = Listbox(root, yscrollcommand=scroll_bar.set, height=30, width=60)
-        scroll_bar.configure(command=select.yview)
-        scroll_bar.grid(column=3, row=2)
-        select.grid(column=1, row=6)
+name_entry = entries[0]
+item_hired_entry = entries[1]
+item_quantity_entry = entries[2]
+receipt_number_entry = entries[3]
 
-        # Empty record list
-        datalist = []
+#  Create submit button for all the
+submit_button = tk.Button(
+    root,
+    text="Submit",
+    command=submit,
+)
+submit_button.grid(row=len(labels), column=0, columnspan=2)
 
-        global update_record
+#  Create open record window button
+open_info_button = tk.Button(
+    root, text="Open Record Viewing Page", command=open_information_window
+)
+open_info_button.grid(row=len(labels) + 1, column=0, columnspan=2)
 
-        def update_record():
-            select.delete(0, END)
-            for n, p, a in datalist:
-                select.insert(END, n)
+#  Create list to store the record
+information_list = []
 
-        # Adding enter button to accept the values enetered
-        def enter():
-            # # Checks if item quantity inputted is a number
-            # try:
-            #     item_quantity_input_interger = int(item_quantity_input.get())
-            # except ValueError:
-            #     messagebox.showerror("Error", "Please enter number!")
-
-            # # Then checks if item quantity inputted is a number within 500 otherwise becomes invalid
-            # if item_quantity_input_interger > 500:
-            #     messagebox.showerror("Error", "Please enter a number within 500!")
-            #     item_quantity_input = " "
-
-            # Making all future values into global to be used in dictionary creation
-            datalist.append(
-                [
-                    customer_name_input.get(),
-                    item_hired_input.get(),
-                    item_quantity_input.get(),
-                    reciept_num_input.get(),
-                ]
-            )
-            update_record()
-
-        enterbutton = Button(root, text="Enter", command=enter)
-        enterbutton.grid(column=1, row=5)
-
-        # Destorying previous page elemnts
-        menubutton_1.destroy()
-        menubutton_2.destroy()
-        label_name.destroy()
-
-        # Adding back button for record keeping page
-        global button_2
-        button_2 = Button(
-            root, text="<--Menu", width="7", command=back, activebackground="red"
-        )
-        button_2.grid(column=1, row=1, sticky=W)
-
-    # Making Record Viewing page
-    def viewrecordspage():
-        root.minsize(height=200, width=170)
-        label_name.destroy()
-        menubutton_1.destroy()
-        menubutton_2.destroy()
-
-        global delete
-        global update_record
-
-        def delete():
-            del datalist[int(select.curseselection()[0])]
-            update_record()
-
-        # Making everything global to be used on the back function
-        global customer_name_label
-        global item_hired_label
-        global item_quantity_label
-        global reciept_num_label
-
-        # Labels for the grid boxes
-        customer_name_label = Label(root, text="Customer Name")
-        customer_name_label.grid(column=1, row=2)
-        item_hired_label = Label(root, text="Hired Item")
-        item_hired_label.grid(column=2, row=2)
-        item_quantity_label = Label(root, text="Item Quantity")
-        item_quantity_label.grid(column=3, row=2)
-        reciept_num_label = Label(root, text="Reciept Number")
-        reciept_num_label.grid(column=4, row=2)
-
-        # Making each variable unique to place into grid boxes
-
-        # Adding back button for record viewing page
-        global button_2
-        button_2 = Button(
-            root, text="<--Menu", width="7", command=back, activebackground="red"
-        )
-        button_2.grid(column=1, row=1, sticky=W)
-
-        # Making a back button that can be used on all pages.
-
-    def back():
-        root.minsize(height=200, width=170)
-        root.title("Party Hire Store Record Keeper")
-        Menu()
-
-        # removing the back button
-        button_2.destroy()
-
-        # Removing the other assests,  buttons and labels
-        customer_name_label.destroy()
-        item_hired_label.destroy()
-        enterbutton.destroy()
-        item_quantity_label.destroy()
-        reciept_num_label.destroy()
-        customer_name_input.destroy()
-        item_hired_input.destroy()
-        item_quantity_input.destroy()
-        reciept_num_input.destroy()
-        select.destroy()
-        scroll_bar.destroy()
-
-    # Labeling the main menu
-    label_name = Label(
-        root, text="Party Hire Store Record Keeper", font=(25), padx=8, pady=5
-    )
-    label_name.grid(column=2, row=1)
-
-    # Making buttons to seperate
-    menubutton_1 = Button(
-        root, text="Add a Record", command=recordpage, activebackground="white"
-    )
-    menubutton_1.grid(column=2, row=2)
-    menubutton_2 = Button(
-        root, text="View Records", command=viewrecordspage, activebackground="white"
-    )
-    menubutton_2.grid(column=2, row=3)
-
-
-Menu()
 root.mainloop()
