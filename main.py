@@ -5,31 +5,38 @@ from tkinter import messagebox
 import base64, zlib
 import tempfile
 
-#   Making a transparent window icon instead of a feather
+# Making a transparent window icon instead of a feather
 ICON = zlib.decompress(
     base64.b64decode(
         "eJxjYGAEQgEBBiDJwZDBy"
         "sAgxsDAoAHEQCEGBQaIOAg4sDIgACMUj4JRMApGwQgF/ykEAFXxQRc="
     )
 )
+
+# Makes a temp file to use as the window icon.
 _, ICON_PATH = tempfile.mkstemp()
 with open(ICON_PATH, "wb") as icon_file:
     icon_file.write(ICON)
 
 
+# Creating record viewiing page (for the database)
 def record_viewer():
     # Clear the existing labels in the display window
     for widget in record_viewer_window.winfo_children():
         widget.destroy()
 
-    # Fetch the inputs from the database
+    # Connect to the database
     connection = sqlite3.connect("userdata.db")
+    # Sets the usage of the cursor
     cursor = connection.cursor()
+    # Able to select input from databse
     cursor.execute("SELECT rowid, * FROM users")
+    # When clicked fetches all inputs on that line
     users = cursor.fetchall()
+    # closes the connection and after window closure
     connection.close()
 
-    # Create labels to define each column
+    # Creates labels to define each column
     name_label = tk.Label(
         record_viewer_window, text="Name", font=("Helvetica", 12, "bold")
     )
@@ -72,7 +79,7 @@ def enter():
     item_quantity = item_quantity_entry.get()
     receipt_number = receipt_number_entry.get()
 
-    # Validate item_quantity as a number within the range
+    # Checks if item_quantity is a digit then checks if it is within the accepted range
     if not item_quantity.isdigit() or not (1 <= int(item_quantity) <= 500):
         messagebox.showerror(
             "Invalid Input", "Item Quantity must be a number between 1 and 500."
@@ -85,6 +92,7 @@ def enter():
         return
 
     # Add "rcn" prefix to the receipt_number
+    # RCN stands for recipet number
     receipt_number = "RCN" + receipt_number
 
     # Save the inputs to a database
