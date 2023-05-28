@@ -55,7 +55,7 @@ def record_viewer():
     )
     receipt_number_label.grid(row=0, column=3, padx=5, pady=5)
 
-    # Display the inputs in a grid by selecting first variable and placing it in a column underneath eaxch label
+    # Display the inputs in a grid by selecting first variable and placing it in a column underneath each label
     for i, user in enumerate(users):
         party_hirer_info = user[0]
         name_label = tk.Label(record_viewer_window, text=user[1])
