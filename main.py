@@ -22,6 +22,7 @@ with open(ICON_PATH, "wb") as icon_file:
 # Creating record viewiing page (for the database)
 def record_viewer():
     # Clear the existing labels in the display window
+    #winfo_children destroys all existing varibales.
     for widget in record_viewer_window.winfo_children():
         widget.destroy()
 
@@ -54,7 +55,7 @@ def record_viewer():
     )
     receipt_number_label.grid(row=0, column=3, padx=5, pady=5)
 
-    # Display the inputs in a grid
+    # Display the inputs in a grid by selecting first variable and placing it in a column underneath eaxch label
     for i, user in enumerate(users):
         party_hirer_info = user[0]
         name_label = tk.Label(record_viewer_window, text=user[1])
@@ -72,7 +73,7 @@ def record_viewer():
         )
         delete_button.grid(row=i + 1, column=4, padx=5, pady=5)
 
-
+#Pulls each input on enter and changes their varibale name
 def enter():
     name = name_entry.get()
     item_hired = item_hired_entry.get()
@@ -86,7 +87,7 @@ def enter():
         )
         return
 
-    # Validate receipt_number as a digit
+    # Validate receipt_number as a digit else it shows a error box.
     if not receipt_number.isdigit():
         messagebox.showerror("Invalid Input", "Receipt Number must be a digit.")
         return
@@ -114,27 +115,27 @@ def enter():
     item_quantity_entry.delete(0, tk.END)
     receipt_number_entry.delete(0, tk.END)
 
-    # Refresh the display window
+    # Refresh the display window to display new inputs
     record_viewer()
 
 
 def delete_entry(party_hirer_info):
-    # Delete the selected entry from the database
+    # Delete the selected entry from the database using a cursor 
     connection = sqlite3.connect("userdata.db")
     cursor = connection.cursor()
     cursor.execute("DELETE FROM users WHERE rowid=?", (party_hirer_info,))
     connection.commit()
     connection.close()
 
-    # Refresh the display window
+    # Refresh the display window after deleting the entry
     record_viewer()
 
 
-# Create the GUI window
+# Creating the window 
 root = tk.Tk()
 root.iconbitmap(default=ICON_PATH)
 root.title("Julie's Party Hire Record Keeper")
-root.geometry("300x300")
+root.geometry("250x250")
 canvas = Canvas(root)
 
 
@@ -188,7 +189,8 @@ def round_rectangle_border(x1, y1, x2, y2, radius=25, **kwargs):
 
 my_rectangle = round_rectangle_border(50, 50, 150, 100, radius=20, fill="blue")
 
-# Create input labels and entry fields
+# Create input labels and entry fields for all inputs
+#Used .pack for ease
 name_label = tk.Label(root, text="Name:")
 name_label.pack()
 name_entry = tk.Entry(root)
@@ -210,17 +212,18 @@ receipt_number_entry = tk.Entry(root)
 receipt_number_entry.pack()
 
 
-# Create a button to save the inputs
+# Create a button to save the inputs and entry them into databse
 enter_button = tk.Button(root, text="Enter", command=enter)
 enter_button.pack()
 
-# Create a display window
+# Create a display window for the databse on start
+#Will be a empty window unless the show database button is pressed
 record_viewer_window = tk.Toplevel(root)
 record_viewer_window.title("Julie's Party Hire Record Keeper")
 
 # Create a button to access the window displaying the inputs
-record_viewer_button = tk.Button(root, text="Display Inputs", command=record_viewer)
+record_viewer_button = tk.Button(root, text="Show Record Keeper", command=record_viewer)
 record_viewer_button.pack()
 
-# Start the main GUI loop
+# call the program to start it.
 root.mainloop()
