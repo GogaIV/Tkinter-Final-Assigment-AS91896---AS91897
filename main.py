@@ -88,10 +88,20 @@ def enter():
         )
         return
 
-    # Validate receipt_number as a digit else it shows a error box.
+    # checks if receipt_number as a digit else it shows a error box.
     if not receipt_number.isdigit():
         messagebox.showerror("Invalid Input", "Receipt Number must be a digit.")
         return
+    
+    #checks that all input boxes have inputs
+    if name == "" :
+        messagebox.showerror("Invalid Input", "Name cannot be empty.")
+        return 
+    
+    if item_hired == "" :
+        messagebox.showerror("Invalid Input", "Item Hired cannot be empty.")
+        return
+    
 
     # Add "rcn" prefix to the receipt_number
     # RCN stands for recipet number
