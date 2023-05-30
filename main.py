@@ -22,7 +22,7 @@ with open(ICON_PATH, "wb") as icon_file:
 # Creating record viewiing page (for the database)
 def record_viewer():
     # Clear the existing labels in the display window
-    #winfo_children destroys all existing varibales.
+    # winfo_children destroys all existing varibales.
     for widget in record_viewer_window.winfo_children():
         widget.destroy()
 
