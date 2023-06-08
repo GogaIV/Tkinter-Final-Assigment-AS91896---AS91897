@@ -120,7 +120,7 @@ def enter():
     )
     connection.commit()
     connection.close()
-
+    
     # Clear the entry fields after saving
     name_entry.delete(0, tk.END)
     item_hired_entry.delete(0, tk.END)
